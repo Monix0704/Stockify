@@ -1,0 +1,49 @@
+<aside class="offcanvas-lg offcanvas-start app-sidebar" tabindex="-1" id="appSidebar" aria-labelledby="sidebarTitle">
+  <div class="offcanvas-header sidebar-mobile-head">
+    <a class="brand" href="{{ url('dashboard:home') }}">
+      <span class="brand-mark"><i class="bi bi-box-seam-fill"></i></span>
+      <span id="sidebarTitle">Stockify</span>
+    </a>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#appSidebar" aria-label="Закрыть меню"></button>
+  </div>
+  <div class="sidebar-inner">
+    <a class="brand sidebar-brand d-none d-lg-flex" href="{{ url('dashboard:home') }}">
+      <span class="brand-mark"><i class="bi bi-box-seam-fill"></i></span>
+      <span>Stockify</span>
+    </a>
+
+    <div class="nav-caption">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+    <nav class="sidebar-nav" aria-label="Основная навигация">
+      <a class="nav-link{% if request.path == url('dashboard:home') %} active{% endif %}" href="{{ url('dashboard:home') }}">
+        <i class="bi bi-grid-1x2"></i><span>Обзор</span>
+      </a>
+      <a class="nav-link{% if request.path.startswith('/catalog/products/') %} active{% endif %}" href="{{ url('catalog:products') }}">
+        <i class="bi bi-boxes"></i><span>Товары</span>
+      </a>
+      <a class="nav-link{% if request.path == url('catalog:categories') %} active{% endif %}" href="{{ url('catalog:categories') }}">
+        <i class="bi bi-tags"></i><span>Категории</span>
+      </a>
+      <a class="nav-link{% if request.path == url('catalog:suppliers') %} active{% endif %}" href="{{ url('catalog:suppliers') }}">
+        <i class="bi bi-truck"></i><span>Поставщики</span>
+      </a>
+    </nav>
+
+    <div class="nav-caption nav-caption-spaced">СКЛАД</div>
+    <nav class="sidebar-nav" aria-label="Складские операции">
+      <a class="nav-link{% if request.path == url('inventory:warehouses') %} active{% endif %}" href="{{ url('inventory:warehouses') }}">
+        <i class="bi bi-building"></i><span>Склады</span>
+      </a>
+      <a class="nav-link{% if request.path == url('inventory:movements') %} active{% endif %}" href="{{ url('inventory:movements') }}">
+        <i class="bi bi-arrow-left-right"></i><span>Движения</span>
+      </a>
+      <a class="nav-link{% if request.path.startswith('/reports/') %} active{% endif %}" href="{{ url('reports:dashboard') }}">
+        <i class="bi bi-graph-up-arrow"></i><span>Отчёты</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-tip"><i class="bi bi-shield-check"></i><span>Каждое движение сохраняется в истории</span></div>
+      <a class="sidebar-admin" href="/admin/"><i class="bi bi-gear"></i><span>Администрирование</span><i class="bi bi-arrow-up-right ms-auto"></i></a>
+    </div>
+  </div>
+</aside>

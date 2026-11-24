@@ -1,0 +1,13 @@
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="pagination-wrap" aria-label="Страницы">
+  <span class="pagination-info">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+  <div class="pagination-actions">
+    {% if page_obj.has_previous() %}
+      <a class="btn btn-pagination" href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page_obj.previous_page_number() }}"><i class="bi bi-chevron-left"></i><span>Назад</span></a>
+    {% else %}<span class="btn btn-pagination disabled"><i class="bi bi-chevron-left"></i><span>Назад</span></span>{% endif %}
+    {% if page_obj.has_next() %}
+      <a class="btn btn-pagination" href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page_obj.next_page_number() }}"><span>Далее</span><i class="bi bi-chevron-right"></i></a>
+    {% else %}<span class="btn btn-pagination disabled"><span>Далее</span><i class="bi bi-chevron-right"></i></span>{% endif %}
+  </div>
+</nav>
+{% endif %}

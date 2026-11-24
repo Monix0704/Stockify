@@ -1,0 +1,18 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="btn sidebar-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar" aria-label="Открыть меню">
+      <i class="bi bi-list"></i>
+    </button>
+    <div class="topbar-context"><span class="context-dot"></span>Система складского учёта</div>
+  </div>
+  <div class="topbar-right">
+    <div class="user-chip">
+      <span class="user-avatar">{{ (request.user.get_short_name() or request.user.username)[:1]|upper }}</span>
+      <span class="user-name">{{ request.user.get_short_name() or request.user.username }}</span>
+    </div>
+    <form method="post" action="{{ url('logout') }}">
+      {{ csrf_input }}
+      <button class="btn btn-quiet" type="submit" title="Выйти" aria-label="Выйти"><i class="bi bi-box-arrow-right"></i></button>
+    </form>
+  </div>
+</header>

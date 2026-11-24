@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Товары{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><div class="eyebrow">КАТАЛОГ</div><h1>Товары</h1><p class="page-subtitle">Каталог позиций и их суммарные остатки на складах.</p></div>
+  <a class="btn btn-outline-action" href="/admin/catalog/product/"><i class="bi bi-gear"></i> Управлять каталогом</a>
+</div>
+
+<section class="panel filter-panel">
+  <form method="get" class="filter-form">
+    <div class="filter-search"><label class="visually-hidden" for="productSearch">Поиск товара</label><i class="bi bi-search"></i><input id="productSearch" class="form-control" type="search" name="q" value="{{ search }}" placeholder="Название или артикул"></div>
+    <div><label class="visually-hidden" for="categoryFilter">Категория</label><select class="form-select" id="categoryFilter" name="category"><option value="">Все категории</option>{% for category in categories %}<option value="{{ category.pk }}"{% if selected_category == category.pk|string %} selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></div>
+    <div><label class="visually-hidden" for="stockFilter">Остаток</label><select class="form-select" id="stockFilter" name="stock"><option value="">Любой остаток</option><option value="available"{% if stock_status == 'available' %} selected{% endif %}>Есть в наличии</option><option value="low"{% if stock_status == 'low' %} selected{% endif %}>Ниже порога</option></select></div>
+    <button class="btn btn-filter" type="submit">Применить</button>
+  </form>
+</section>
+
+<section class="panel table-panel">
+  <div class="panel-header table-panel-heading"><div><h2>Список товаров</h2><p>{{ page_obj.paginator.count }} позиций</p></div></div>
+  {% if page_obj.object_list %}
+  <div class="table-responsive"><table class="table app-table align-middle mb-0">
+    <thead><tr><th>Товар</th><th>Категория</th><th>Поставщик</th><th>Порог</th><th>Статус запаса</th><th class="text-end">Остаток</th></tr></thead>
+    <tbody>{% for product in page_obj.object_list %}
+      <tr>
+        <td><a class="table-primary-link" href="{{ url('catalog:product_detail', product.pk) }}">{{ product.name }}</a><div class="table-secondary-text">{{ product.sku }}</div></td>
+        <td>{{ product.category.name }}</td>
+        <td>{{ product.preferred_supplier.name if product.preferred_supplier else '—' }}</td>
+        <td>{{ product.reorder_level|quantity }} <span class="unit-muted">{{ product.get_unit_display() }}</span></td>
+        <td>{% if not product.is_active %}<span class="status-pill status-muted">Неактивен</span>{% elif product.stock_total <= product.reorder_level %}<span class="status-pill status-warning">Нужно пополнить</span>{% else %}<span class="status-pill status-success">В норме</span>{% endif %}</td>
+        <td class="text-end"><span class="quantity-value">{{ product.stock_total|quantity }}</span> <span class="unit-muted">{{ product.get_unit_display() }}</span></td>
+      </tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% else %}<div class="empty-state"><span class="empty-icon"><i class="bi bi-search"></i></span><h3>Ничего не найдено</h3><p>Измените параметры поиска или фильтры.</p></div>{% endif %}
+  {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

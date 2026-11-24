@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Категории{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">КАТАЛОГ</div><h1>Категории</h1><p class="page-subtitle">Группы для удобной навигации по товарному каталогу.</p></div><a class="btn btn-outline-action" href="/admin/catalog/category/"><i class="bi bi-gear"></i> Управлять категориями</a></div>
+<section class="panel filter-panel"><form method="get" class="filter-form"><div class="filter-search"><label class="visually-hidden" for="categorySearch">Поиск категории</label><i class="bi bi-search"></i><input class="form-control" id="categorySearch" type="search" name="q" value="{{ search }}" placeholder="Название или описание"></div><button class="btn btn-filter" type="submit">Найти</button></form></section>
+<section class="panel table-panel"><div class="panel-header table-panel-heading"><div><h2>Список категорий</h2><p>{{ page_obj.paginator.count }} категорий</p></div></div>
+{% if page_obj.object_list %}<div class="table-responsive"><table class="table app-table align-middle mb-0"><thead><tr><th>Название</th><th>Описание</th><th class="text-end">Товаров</th></tr></thead><tbody>{% for category in page_obj.object_list %}<tr><td><span class="table-primary-link">{{ category.name }}</span></td><td class="text-muted-cell">{{ category.description or '—' }}</td><td class="text-end">{{ category.product_count }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><span class="empty-icon"><i class="bi bi-tags"></i></span><h3>Категорий пока нет</h3><p>Добавьте категории через каталог.</p></div>{% endif %}
+{% include "partials/pagination.html" %}</section>
+{% endblock %}

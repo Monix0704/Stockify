@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Склады{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">СКЛАДСКОЙ УЧЁТ</div><h1>Склады</h1><p class="page-subtitle">Места хранения и сводка по зарегистрированным движениям.</p></div><a class="btn btn-outline-action" href="/admin/inventory/warehouse/"><i class="bi bi-gear"></i> Управлять складами</a></div>
+<section class="warehouse-grid">
+  {% for warehouse in warehouses %}
+  <article class="panel warehouse-card">
+    <div class="warehouse-card-top"><span class="stat-icon icon-violet"><i class="bi bi-building"></i></span><span class="status-pill {{ 'status-success' if warehouse.is_active else 'status-muted' }}">{{ 'Активен' if warehouse.is_active else 'Неактивен' }}</span></div>
+    <h2>{{ warehouse.name }}</h2>
+    <p class="warehouse-address"><i class="bi bi-geo-alt"></i>{{ warehouse.address or 'Адрес не указан' }}</p>
+    {% if warehouse.description %}<p class="warehouse-description">{{ warehouse.description }}</p>{% endif %}
+    <div class="warehouse-stats"><div><strong>{{ warehouse.product_count }}</strong><span>товаров с движением</span></div><div><strong>{{ warehouse.movement_count }}</strong><span>операций в журнале</span></div></div>
+    <a class="text-link" href="{{ url('inventory:movements') }}?warehouse={{ warehouse.pk }}">История склада <i class="bi bi-arrow-right"></i></a>
+  </article>
+  {% else %}
+  <article class="panel empty-state warehouse-empty"><span class="empty-icon"><i class="bi bi-building"></i></span><h3>Склады ещё не созданы</h3><p>Создайте первый склад, чтобы начать учитывать поступления и списания.</p><a class="btn btn-primary-action" href="/admin/inventory/warehouse/add/"><i class="bi bi-plus-lg"></i> Создать склад</a></article>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% for message in messages %}
+  {% set alert_type = 'danger' if message.tags == 'error' else message.tags %}
+  <div class="alert alert-{{ alert_type }} alert-dismissible fade show app-alert" role="alert">
+    <span>{{ message }}</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+  </div>
+{% endfor %}

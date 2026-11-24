@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+<div class="breadcrumb-line"><a href="{{ url('inventory:movements') }}"><i class="bi bi-arrow-left"></i> История движений</a><span>/</span><span>{{ page_title }}</span></div>
+<div class="page-heading"><div><div class="eyebrow">НОВАЯ ОПЕРАЦИЯ</div><h1>{{ page_title }}</h1><p class="page-subtitle">Операция будет записана в журнал и повлияет на расчёт остатка.</p></div></div>
+<div class="form-layout">
+  <section class="panel movement-form-panel">
+    {% if not has_choices %}<div class="alert alert-warning">Для операции нужны активный товар и активный склад. Добавьте их в каталоге и разделе складов.</div>{% endif %}
+    <form method="post" novalidate>
+      {{ csrf_input }}
+      {% for error in form.non_field_errors() %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+      <div class="form-field"><label for="{{ form.product.id_for_label }}">{{ form.product.label }}</label>{{ form.product }}{% for error in form.product.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>
+      <div class="form-field"><label for="{{ form.warehouse.id_for_label }}">{{ form.warehouse.label }}</label>{{ form.warehouse }}{% for error in form.warehouse.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>
+      <div class="form-field"><label for="{{ form.quantity.id_for_label }}">{{ form.quantity.label }}</label><div class="quantity-input-wrap">{{ form.quantity }}<span class="input-suffix">ед.</span></div><div class="field-hint">Введите значение больше нуля, до трёх знаков после запятой.</div>{% for error in form.quantity.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>
+      <div class="form-field"><label for="{{ form.note.id_for_label }}">{{ form.note.label }} <span class="optional-label">необязательно</span></label>{{ form.note }}{% for error in form.note.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>
+      <div class="form-actions"><a class="btn btn-cancel" href="{{ url('inventory:movements') }}">Отмена</a><button class="btn {{ 'btn-primary-action' if is_receipt else 'btn-danger-action' }}" type="submit"{% if not has_choices %} disabled{% endif %}><i class="bi {{ 'bi-box-arrow-in-down' if is_receipt else 'bi-box-arrow-up-right' }}"></i>{{ submit_label }}</button></div>
+    </form>
+  </section>
+  <aside class="panel form-aside">
+    <span class="aside-icon {{ 'icon-green' if is_receipt else 'icon-amber' }}"><i class="bi {{ 'bi-info-circle' if is_receipt else 'bi-shield-check' }}"></i></span>
+    {% if is_receipt %}<h2>Поступление</h2><p>Количество будет добавлено к остатку выбранного товара на выбранном складе.</p>{% else %}<h2>Проверка остатка</h2><p>Списание не пройдёт, если на складе недостаточно товара. Остаток проверяется внутри транзакции.</p>{% endif %}
+    <div class="aside-divider"></div><div class="aside-note"><i class="bi bi-lock"></i><span>Запись нельзя изменить или удалить после проведения. Для исправления создайте обратную операцию с пояснением.</span></div>
+  </aside>
+</div>
+{% endblock %}

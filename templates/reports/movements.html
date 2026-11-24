@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Отчёт по движениям{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ОТЧЁТЫ</div><h1>Движения товаров</h1><p class="page-subtitle">Журнал операций с фильтрацией по периоду, складу, товару и типу.</p></div><a class="btn btn-outline-action" href="{{ url('reports:dashboard') }}"><i class="bi bi-arrow-left"></i> К аналитике</a></div>
+<section class="panel report-filter-panel"><form method="get" class="report-movement-filter-grid">
+  <div><label for="id_date_from">{{ form.date_from.label }}</label>{{ form.date_from }}{% for error in form.date_from.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+  <div><label for="id_date_to">{{ form.date_to.label }}</label>{{ form.date_to }}{% for error in form.date_to.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+  <div><label for="id_warehouse">{{ form.warehouse.label }}</label>{{ form.warehouse }}</div>
+  <div><label for="id_product">{{ form.product.label }}</label>{{ form.product }}</div>
+  <div><label for="id_movement_type">{{ form.movement_type.label }}</label>{{ form.movement_type }}</div>
+  <button class="btn btn-filter" type="submit"><i class="bi bi-funnel"></i> Применить</button>
+</form></section>
+<section class="panel table-panel report-table-panel">
+  <div class="panel-header table-panel-heading"><div><h2>Операции</h2><p>{{ page_obj.paginator.count }} записей</p></div><a class="btn btn-export" href="{{ url('reports:movement_export') }}{% if page_query %}?{{ page_query }}{% endif %}"><i class="bi bi-download"></i> Скачать CSV</a></div>
+  {% if page_obj.object_list %}<div class="table-responsive"><table class="table app-table align-middle mb-0"><thead><tr><th>Дата</th><th>Товар</th><th>Склад</th><th>Тип</th><th class="text-end">Количество</th><th>Пользователь</th></tr></thead><tbody>
+  {% for movement in page_obj.object_list %}<tr><td class="date-cell">{{ movement.created_at.strftime('%d.%m.%Y, %H:%M') }}</td><td><a class="table-primary-link" href="{{ url('catalog:product_detail', movement.product_id) }}">{{ movement.product.name }}</a><div class="table-secondary-text">{{ movement.product.sku }}</div></td><td>{{ movement.warehouse.name }}</td><td><span class="movement-pill {{ 'movement-in' if movement.movement_type == 'IN' else 'movement-out' }}">{{ movement.get_movement_type_display() }}</span></td><td class="text-end fw-semibold">{{ movement.quantity|quantity }} {{ movement.product.get_unit_display() }}</td><td>{{ (movement.created_by.get_short_name() or movement.created_by.username) if movement.created_by else '—' }}</td></tr>{% endfor %}
+  </tbody></table></div>{% else %}<div class="empty-state"><span class="empty-icon"><i class="bi bi-arrow-left-right"></i></span><h3>Операции не найдены</h3><p>Измените фильтры или выберите другой период.</p></div>{% endif %}
+  {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

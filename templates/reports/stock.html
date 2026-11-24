@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Отчёт по остаткам{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ОТЧЁТЫ</div><h1>Остатки товаров</h1><p class="page-subtitle">Текущий остаток рассчитан по движениям для каждой пары «товар — склад».</p></div><a class="btn btn-outline-action" href="{{ url('reports:dashboard') }}"><i class="bi bi-arrow-left"></i> К аналитике</a></div>
+<section class="panel report-filter-panel"><form method="get" class="report-filter-grid">
+  <div><label for="id_warehouse">Склад</label>{{ form.warehouse }}</div>
+  <div><label for="id_category">Категория</label>{{ form.category }}</div>
+  <div><label for="id_product">Товар</label>{{ form.product }}</div>
+  <button class="btn btn-filter" type="submit"><i class="bi bi-funnel"></i> Применить</button>
+</form></section>
+<section class="panel table-panel report-table-panel">
+  <div class="panel-header table-panel-heading"><div><h2>Сводка по остаткам</h2><p>{{ page_obj.paginator.count }} товарных позиций со складскими движениями</p></div><a class="btn btn-export" href="{{ url('reports:stock_export') }}{% if page_query %}?{{ page_query }}{% endif %}"><i class="bi bi-download"></i> Скачать CSV</a></div>
+  {% if page_obj.object_list %}<div class="table-responsive"><table class="table app-table align-middle mb-0"><thead><tr><th>Товар</th><th>SKU</th><th>Склад</th><th class="text-end">Текущий остаток</th><th>Единица</th></tr></thead><tbody>
+    {% for row in page_obj.object_list %}<tr><td><a class="table-primary-link" href="{{ url('catalog:product_detail', row.product_id) }}">{{ row.product__name }}</a></td><td class="report-sku">{{ row.product__sku }}</td><td>{{ row.warehouse__name }}</td><td class="text-end"><span class="quantity-value">{{ row.balance|quantity }}</span></td><td><span class="unit-chip">{{ row.unit_label }}</span></td></tr>{% endfor %}
+  </tbody></table></div>{% else %}<div class="empty-state"><span class="empty-icon"><i class="bi bi-boxes"></i></span><h3>Остатков по этим фильтрам нет</h3><p>Попробуйте изменить условия. Позиции без движений не имеют записи о паре «товар — склад».</p></div>{% endif %}
+  {% include "partials/pagination.html" %}
+</section>
+{% endblock %}

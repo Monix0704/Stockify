@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Отчёты и аналитика{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><div class="eyebrow">АНАЛИТИКА</div><h1>Отчёты и аналитика</h1><p class="page-subtitle">Операционная активность на основе истории складских движений.</p></div>
+  <div class="heading-actions"><a class="btn btn-outline-action" href="{{ url('reports:stock') }}"><i class="bi bi-boxes"></i> Остатки</a><a class="btn btn-primary-action" href="{{ url('reports:movements') }}"><i class="bi bi-arrow-left-right"></i> Движения</a></div>
+</div>
+
+<section class="panel report-filter-panel">
+  <form method="get" class="report-period-form">
+    <div class="report-period-intro"><span class="report-filter-icon"><i class="bi bi-calendar3"></i></span><div><strong>Период отчёта</strong><small>Не более 366 дней</small></div></div>
+    <div class="report-date-field"><label for="{{ form.date_from.id_for_label }}">{{ form.date_from.label }}</label>{{ form.date_from }}{% for error in form.date_from.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+    <div class="report-date-field"><label for="{{ form.date_to.id_for_label }}">{{ form.date_to.label }}</label>{{ form.date_to }}{% for error in form.date_to.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+    <button class="btn btn-filter" type="submit"><i class="bi bi-funnel"></i> Применить</button>
+  </form>
+</section>
+
+{% if is_valid %}
+<section class="report-stats-grid" aria-label="Складская активность за период">
+  <article class="report-stat"><span class="report-stat-icon icon-blue"><i class="bi bi-arrow-left-right"></i></span><div><small>Всего операций</small><strong>{{ totals.total }}</strong><span>за выбранный период</span></div></article>
+  <article class="report-stat"><span class="report-stat-icon icon-green"><i class="bi bi-box-arrow-in-down"></i></span><div><small>Поступления</small><strong>{{ totals.incoming }}</strong><span>операций принято</span></div></article>
+  <article class="report-stat"><span class="report-stat-icon icon-amber"><i class="bi bi-box-arrow-up-right"></i></span><div><small>Списания</small><strong>{{ totals.outgoing }}</strong><span>операций списано</span></div></article>
+</section>
+
+<section class="report-chart-grid">
+  <article class="panel report-chart-panel report-chart-wide">
+    <div class="panel-header"><div><div class="eyebrow">ДИНАМИКА</div><h2>Операции по дням</h2><p>Количество движений каждого типа за выбранный период.</p></div><span class="chart-period-label">{{ form.date_from.value() }} — {{ form.date_to.value() }}</span></div>
+    <div class="chart-canvas-wrap"><canvas id="dailyChart" aria-label="Поступления и списания по дням" role="img"></canvas></div>
+    <div class="chart-legend"><span><i class="legend-dot legend-in"></i>Поступления</span><span><i class="legend-dot legend-out"></i>Списания</span></div>
+  </article>
+  <article class="panel report-chart-panel">
+    <div class="panel-header"><div><div class="eyebrow">СРАВНЕНИЕ</div><h2>Поступления и списания</h2><p>Количество операций за период.</p></div></div>
+    <div class="chart-canvas-wrap comparison-canvas"><canvas id="comparisonChart" aria-label="Сравнение поступлений и списаний" role="img"></canvas></div>
+  </article>
+  <article class="panel report-chart-panel report-chart-wide">
+    <div class="panel-header"><div><div class="eyebrow">РАСПРЕДЕЛЕНИЕ</div><h2>Активность складов</h2><p>Количество операций по каждому складу.</p></div></div>
+    {% if warehouse_activity %}<div class="chart-canvas-wrap warehouse-chart-wrap"><canvas id="warehouseChart" aria-label="Активность складов по количеству операций" role="img"></canvas></div>{% else %}<div class="chart-empty">Склады пока не созданы.</div>{% endif %}
+  </article>
+  <article class="panel top-products-panel">
+    <div class="panel-header"><div><div class="eyebrow">ТОП ПО АКТИВНОСТИ</div><h2>Часто перемещаемые товары</h2><p>Рейтинг по числу операций.</p></div></div>
+    {% if top_products %}<div class="top-products-list">{% for product in top_products %}<div class="top-product-row"><span class="top-product-rank">{{ loop.index }}</span><div class="top-product-name"><strong>{{ product.product__name }}</strong><small>{{ product.product__sku }} · {{ product.handled_quantity|quantity }} {{ product.unit_label }} обработано</small></div><span class="top-product-count">{{ product.operation_count }} <small>операций</small></span></div>{% endfor %}</div>{% else %}<div class="chart-empty">За этот период движений не было.</div>{% endif %}
+  </article>
+</section>
+
+<script id="reports-chart-data" type="application/json">{{ chart_data|tojson }}</script>
+{% else %}
+<section class="panel report-invalid-state"><span class="empty-icon"><i class="bi bi-calendar-x"></i></span><h2>Проверьте выбранный период</h2><p>Дата начала должна предшествовать дате окончания, а диапазон должен быть не длиннее одного года.</p></section>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ static('stockify/js/reports.js') }}"></script>{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Движения{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">СКЛАДСКОЙ УЧЁТ</div><h1>История движений</h1><p class="page-subtitle">Неизменяемый журнал поступлений и списаний.</p></div><div class="heading-actions"><a class="btn btn-outline-action" href="{{ url('inventory:issue') }}"><i class="bi bi-arrow-up-right"></i> Списание</a><a class="btn btn-primary-action" href="{{ url('inventory:receive') }}"><i class="bi bi-plus-lg"></i> Поступление</a></div></div>
+<section class="panel filter-panel">
+  <form method="get" class="movement-filter-form">
+    <div><label for="movementType" class="filter-label">Тип операции</label><select class="form-select" name="type" id="movementType"><option value="">Все типы</option><option value="IN"{% if movement_type == 'IN' %} selected{% endif %}>Поступление</option><option value="OUT"{% if movement_type == 'OUT' %} selected{% endif %}>Списание</option></select></div>
+    <div><label for="movementProduct" class="filter-label">Товар</label><select class="form-select" name="product" id="movementProduct"><option value="">Все товары</option>{% for product in products %}<option value="{{ product.pk }}"{% if selected_product == product.pk|string %} selected{% endif %}>{{ product.name }} · {{ product.sku }}</option>{% endfor %}</select></div>
+    <div><label for="movementWarehouse" class="filter-label">Склад</label><select class="form-select" name="warehouse" id="movementWarehouse"><option value="">Все склады</option>{% for warehouse in warehouses %}<option value="{{ warehouse.pk }}"{% if selected_warehouse == warehouse.pk|string %} selected{% endif %}>{{ warehouse.name }}</option>{% endfor %}</select></div>
+    <div><label for="dateFrom" class="filter-label">С даты</label><input class="form-control" type="date" id="dateFrom" name="from" value="{{ date_from }}"></div>
+    <div><label for="dateTo" class="filter-label">По дату</label><input class="form-control" type="date" id="dateTo" name="to" value="{{ date_to }}"></div>
+    <button class="btn btn-filter" type="submit"><i class="bi bi-funnel"></i> Фильтр</button>
+  </form>
+</section>
+<section class="panel table-panel"><div class="panel-header table-panel-heading"><div><h2>Журнал операций</h2><p>{{ page_obj.paginator.count }} записей</p></div></div>
+{% if page_obj.object_list %}<div class="table-responsive"><table class="table app-table align-middle mb-0"><thead><tr><th>Операция</th><th>Товар</th><th>Склад</th><th>Комментарий</th><th>Выполнил</th><th>Дата</th><th class="text-end">Количество</th></tr></thead><tbody>
+{% for movement in page_obj.object_list %}<tr><td><span class="movement-pill {{ 'movement-in' if movement.movement_type == 'IN' else 'movement-out' }}"><i class="bi {{ 'bi-arrow-down-left' if movement.movement_type == 'IN' else 'bi-arrow-up-right' }}"></i>{{ movement.get_movement_type_display() }}</span></td><td><a class="table-primary-link" href="{{ url('catalog:product_detail', movement.product_id) }}">{{ movement.product.name }}</a><div class="table-secondary-text">{{ movement.product.sku }}</div></td><td>{{ movement.warehouse.name }}</td><td>{{ movement.note or '—' }}</td><td>{{ (movement.created_by.get_short_name() or movement.created_by.username) if movement.created_by else 'Система' }}</td><td class="date-cell">{{ movement.created_at.strftime('%d.%m.%Y, %H:%M') }}</td><td class="text-end fw-semibold">{{ movement.quantity|quantity }} {{ movement.product.get_unit_display() }}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-state"><span class="empty-icon"><i class="bi bi-arrow-left-right"></i></span><h3>Движений не найдено</h3><p>Поменяйте фильтры или зарегистрируйте первую операцию.</p><a href="{{ url('inventory:receive') }}" class="btn btn-primary-action"><i class="bi bi-plus-lg"></i> Новое поступление</a></div>{% endif %}
+{% include "partials/pagination.html" %}</section>
+{% endblock %}

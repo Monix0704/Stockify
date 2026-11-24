@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<section class="login-card">
+  <a class="brand login-brand" href="{{ url('dashboard:home') }}"><span class="brand-mark"><i class="bi bi-box-seam-fill"></i></span><span>Stockify</span></a>
+  <div class="eyebrow">СКЛАДСКОЙ УЧЁТ</div>
+  <h1>С возвращением</h1>
+  <p class="login-subtitle">Войдите, чтобы открыть рабочую панель.</p>
+  <form method="post" class="login-form" novalidate>
+    {{ csrf_input }}
+    {% for error in form.non_field_errors() %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    <div class="form-field"><label for="{{ form.username.id_for_label }}">Имя пользователя</label>{{ form.username }}{% for error in form.username.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>
+    <div class="form-field"><label for="{{ form.password.id_for_label }}">Пароль</label>{{ form.password }}{% for error in form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}</div>
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <button class="btn btn-primary-action w-100" type="submit">Войти <i class="bi bi-arrow-right"></i></button>
+  </form>
+  <p class="login-footnote"><i class="bi bi-shield-lock"></i> Доступ предоставляется администратором системы.</p>
+</section>
+{% endblock %}
